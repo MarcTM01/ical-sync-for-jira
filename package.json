@@ -5,8 +5,10 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "jest",
-    "lint": "eslint src/ --ext .ts",
-    "format": "prettier src/ --write",
+    "lint-check": "eslint src/ --ext .ts",
+    "lint-fix": "eslint src/ --ext .ts --fix",
+    "format-check": "prettier src/ --check",
+    "format-fix": "prettier src/ --write",
     "clean": "rimraf build",
     "transpile": "tsc --build && tsc-alias",
     "start:dev": "ts-node -r tsconfig-paths/register -r dotenv/config ./src/index",
