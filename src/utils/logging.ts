@@ -1,7 +1,7 @@
 import winston from 'winston';
 
-export interface ApplicationLogger  {
-    getLogger(module: string): winston.Logger
+export interface ApplicationLogger {
+  getLogger(module: string): winston.Logger;
 }
 
 class PrettyPrintConsoleLogger implements ApplicationLogger {
@@ -53,7 +53,7 @@ class JsonConsoleLogger implements ApplicationLogger {
       transports: [
         new winston.transports.Console({
           handleExceptions: true,
-          handleRejections: true
+          handleRejections: true,
         }),
       ],
     });
@@ -67,14 +67,14 @@ class JsonConsoleLogger implements ApplicationLogger {
 export class Logger {
   private static instance: ApplicationLogger;
 
-  private constructor() { }
+  private constructor() {}
 
   private static getLoggerInstance(): ApplicationLogger {
     if (!Logger.instance) {
       if (process.env.NODE_ENV !== 'production') {
-          Logger.instance = new PrettyPrintConsoleLogger('debug')
+        Logger.instance = new PrettyPrintConsoleLogger('debug');
       } else {
-        Logger.instance = new JsonConsoleLogger('info')
+        Logger.instance = new JsonConsoleLogger('info');
       }
     }
     return Logger.instance;
