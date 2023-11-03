@@ -1,0 +1,33 @@
+{
+  "name": "ical-sync-for-jira",
+  "version": "1.0.0",
+  "description": "Ical Sync for Jira scans Jira issues for deadlines and assembles them into an iCalendar file, which you can subscribe to from your favorite calendar software to stay on top of deadlines.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "jest",
+    "clean": "rimraf build",
+    "transpile": "tsc",
+    "start:prod": "node build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarcTM01/ical-sync-for-jira.git"
+  },
+  "keywords": [
+    "jira",
+    "ical",
+    "iCalendar"
+  ],
+  "author": "MarcTM01",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MarcTM01/ical-sync-for-jira/issues"
+  },
+  "homepage": "https://github.com/MarcTM01/ical-sync-for-jira#readme",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "@types/node": "^20.8.10",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.2.2"
+  }
+}
