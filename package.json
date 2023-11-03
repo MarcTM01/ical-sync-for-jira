@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "jest",
+    "lint": "eslint src/ --ext .ts",
     "clean": "rimraf build",
     "transpile": "tsc",
     "start:prod": "node build"
@@ -27,6 +28,9 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.8.10",
+    "@typescript-eslint/eslint-plugin": "^6.9.1",
+    "@typescript-eslint/parser": "^6.9.1",
+    "eslint": "^8.52.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
   }
