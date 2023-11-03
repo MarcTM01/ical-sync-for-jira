@@ -8,8 +8,17 @@
     "lint": "eslint src/ --ext .ts",
     "format": "prettier src/ --write",
     "clean": "rimraf build",
-    "transpile": "tsc",
+    "transpile": "tsc --build && tsc-alias",
+    "start:dev": "ts-node -r tsconfig-paths/register -r dotenv/config ./src/index",
+    "start:nodemon": "nodemon",
     "start:prod": "node build"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "ts",
+    "exec": "ts-node -r tsconfig-paths/register -r dotenv/config ./src/index"
   },
   "repository": {
     "type": "git",
@@ -31,10 +40,15 @@
     "@types/node": "^20.8.10",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "@typescript-eslint/parser": "^6.9.1",
+    "dotenv": "^16.3.1",
     "eslint": "^8.52.0",
     "eslint-config-prettier": "^9.0.0",
+    "nodemon": "^3.0.1",
     "prettier": "3.0.3",
     "rimraf": "^5.0.5",
+    "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.8",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.2.2"
   }
 }
