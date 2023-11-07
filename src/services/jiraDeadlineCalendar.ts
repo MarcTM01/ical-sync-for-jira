@@ -1,4 +1,7 @@
-import { ApplicationConfig, SynchronizationConfiguration } from '@utils/config';
+import {
+  ApplicationConfig,
+  SynchronizationConfiguration,
+} from '@services/config';
 import { ApiError } from '@utils/errors';
 import { pollJiraIssues } from './jira';
 import { generateCalendarForJiraIssues } from './jiraDeadlineCalendarIssueConverter';

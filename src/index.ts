@@ -4,6 +4,7 @@ import packageJson from 'package.json';
 import { createApp } from './api/express';
 import { createServer } from 'http';
 import { setupCalendarRoutes } from './api/calendarRoute';
+import { ApplicationConfig } from '@services/config';
 
 const Log = Logger.getLogger('index.ts');
 
@@ -13,12 +14,11 @@ function launch() {
   const app = createApp();
   setupCalendarRoutes(app);
 
-  const port = process.env.PORT || 8080;
-  app.set('port', port);
+  app.set('port', ApplicationConfig.port);
 
   const httpServer = createServer(app);
-  httpServer.listen(port, () => {
-    Log.info(`HTTP-Server live at http://127.0.0.1:${port}`);
+  httpServer.listen(ApplicationConfig.port, () => {
+    Log.info(`HTTP-Server live at http://127.0.0.1:${ApplicationConfig.port}`);
   });
 }
 

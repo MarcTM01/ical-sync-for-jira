@@ -1,6 +1,6 @@
 import { Version3Client } from 'jira.js';
 import { Issue } from 'jira.js/out/version3/models';
-import { ApplicationConfig } from '@utils/config';
+import { ApplicationConfig } from '@services/config';
 import { Config } from 'jira.js/src/config';
 import { Logger } from '@utils/logging';
 
