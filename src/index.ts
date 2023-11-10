@@ -3,19 +3,34 @@ import { exit } from 'process';
 import packageJson from 'package.json';
 import { createApp } from './api/express';
 import { createServer } from 'http';
-import { setupCalendarRoutes } from './api/calendarRoute';
+import { CalendarRouteController } from './api/calendarRoute';
 import { ApplicationConfig } from '@services/config';
-import { setupRedisClient } from '@services/jiraDeadlineCalendarCache';
+import { JiraDeadlineCalendarCacheService } from '@services/jiraDeadlineCalendarCache';
+import { JiraService } from '@services/jira';
+import { JiraDeadlineCalendarService } from '@services/jiraDeadlineCalendar';
 
 const Log = Logger.getLogger('index.ts');
 
 async function launch() {
   Log.info(`Launching iCal sync for Jira v${packageJson.version}`);
 
-  await setupRedisClient();
+  const jiraDeadlineCalendarCacheService = new JiraDeadlineCalendarCacheService(
+    ApplicationConfig.redis,
+  );
+  await jiraDeadlineCalendarCacheService.connect();
+
+  const jiraService = new JiraService(ApplicationConfig.jira);
+  const jiraDeadlineCalendarService = new JiraDeadlineCalendarService(
+    jiraService,
+    jiraDeadlineCalendarCacheService,
+  );
 
   const app = createApp();
-  setupCalendarRoutes(app);
+
+  const calendarController = new CalendarRouteController(
+    jiraDeadlineCalendarService,
+  );
+  calendarController.setupCalendarRoutes(app);
 
   app.set('port', ApplicationConfig.port);
 

@@ -3,12 +3,9 @@ import {
   SynchronizationConfiguration,
 } from '@services/config';
 import { ApiError } from '@utils/errors';
-import { pollJiraIssues } from './jira';
+import { JiraService } from './jira';
 import { generateCalendarForJiraIssues } from './jiraDeadlineCalendarIssueConverter';
-import {
-  cacheJiraDeadlineCalendar,
-  retrieveJiraDeadlineCalendar,
-} from '@services/jiraDeadlineCalendarCache';
+import { JiraDeadlineCalendarCacheService } from '@services/jiraDeadlineCalendarCache';
 import { Logger } from '@utils/logging';
 
 const Log = Logger.getLogger('services/jiraDeadlineCalendar.ts');
@@ -25,82 +22,98 @@ export class JiraDeadlineCalendar {
   }
 }
 
-function generateNotFoundError(): ApiError {
-  return new ApiError(404, 'Unknown calendar');
-}
+export class JiraDeadlineCalendarService {
+  private readonly jiraService: JiraService;
+  private readonly jiraDeadlineCalendarCacheService: JiraDeadlineCalendarCacheService;
 
-function getCalendarConfigurationAndCheckAuthorization(
-  calendarId: string,
-  accessToken: string,
-): SynchronizationConfiguration {
-  const calendarConfig = ApplicationConfig.synchronizationConfig.find(
-    (it) => it.id == calendarId,
-  );
-
-  if (!calendarConfig) {
-    throw generateNotFoundError();
+  constructor(
+    jiraService: JiraService,
+    jiraDeadlineCalendarCacheService: JiraDeadlineCalendarCacheService,
+  ) {
+    this.jiraService = jiraService;
+    this.jiraDeadlineCalendarCacheService = jiraDeadlineCalendarCacheService;
   }
 
-  const authorized = calendarConfig.accessTokens.includes(accessToken);
-  if (!authorized) {
-    // Throw identical 404 to not leak valid calendar ids to attackers.
-    throw generateNotFoundError();
+  private generateNotFoundError(): ApiError {
+    return new ApiError(404, 'Unknown calendar');
   }
 
-  return calendarConfig;
-}
+  private getCalendarConfigurationAndCheckAuthorization(
+    calendarId: string,
+    accessToken: string,
+  ): SynchronizationConfiguration {
+    const calendarConfig = ApplicationConfig.synchronizationConfig.find(
+      (it) => it.id == calendarId,
+    );
 
-async function refreshCalendar(
-  calendarConfig: SynchronizationConfiguration,
-): Promise<JiraDeadlineCalendar> {
-  const jiraIssues = await pollJiraIssues(
-    calendarConfig.jiraConfiguration.host,
-    calendarConfig.jiraConfiguration.authentication,
-    calendarConfig.jiraConfiguration.jql,
-  );
+    if (!calendarConfig) {
+      throw this.generateNotFoundError();
+    }
 
-  const convertedCalendar = generateCalendarForJiraIssues(
-    calendarConfig.calendarName,
-    jiraIssues,
-  );
-  const deadlineCalendar = new JiraDeadlineCalendar(
-    calendarConfig.id,
-    new Date(),
-    convertedCalendar.toString(),
-  );
+    const authorized = calendarConfig.accessTokens.includes(accessToken);
+    if (!authorized) {
+      // Throw identical 404 to not leak valid calendar ids to attackers.
+      throw this.generateNotFoundError();
+    }
 
-  await cacheJiraDeadlineCalendar(
-    deadlineCalendar,
-    calendarConfig.standardTtlInSeconds,
-    calendarConfig.extendedTtlInSeconds,
-  );
+    return calendarConfig;
+  }
 
-  return deadlineCalendar;
-}
+  private async refreshCalendar(
+    calendarConfig: SynchronizationConfiguration,
+  ): Promise<JiraDeadlineCalendar> {
+    const jiraIssues = await this.jiraService.pollJiraIssues(
+      calendarConfig.jiraConfiguration.host,
+      calendarConfig.jiraConfiguration.authentication,
+      calendarConfig.jiraConfiguration.jql,
+    );
 
-export async function getJiraDeadlineCalendar(
-  calendarId: string,
-  accessToken: string,
-): Promise<JiraDeadlineCalendar> {
-  const calendarConfig = getCalendarConfigurationAndCheckAuthorization(
-    calendarId,
-    accessToken,
-  );
+    const convertedCalendar = generateCalendarForJiraIssues(
+      calendarConfig.calendarName,
+      jiraIssues,
+    );
+    const deadlineCalendar = new JiraDeadlineCalendar(
+      calendarConfig.id,
+      new Date(),
+      convertedCalendar.toString(),
+    );
 
-  const cachedCalendar = await retrieveJiraDeadlineCalendar(calendarId);
+    await this.jiraDeadlineCalendarCacheService.cacheJiraDeadlineCalendar(
+      deadlineCalendar,
+      calendarConfig.standardTtlInSeconds,
+      calendarConfig.extendedTtlInSeconds,
+    );
 
-  if (cachedCalendar == null) {
-    return refreshCalendar(calendarConfig);
-  } else if (cachedCalendar.standardTtlExpired) {
-    try {
-      return refreshCalendar(calendarConfig);
-    } catch (e) {
-      Log.error(`Error while refreshing calendar. Serving stale cache.`, e, {
-        calendarId: calendarId,
-      });
+    return deadlineCalendar;
+  }
+
+  async getJiraDeadlineCalendar(
+    calendarId: string,
+    accessToken: string,
+  ): Promise<JiraDeadlineCalendar> {
+    const calendarConfig = this.getCalendarConfigurationAndCheckAuthorization(
+      calendarId,
+      accessToken,
+    );
+
+    const cachedCalendar =
+      await this.jiraDeadlineCalendarCacheService.retrieveJiraDeadlineCalendar(
+        calendarId,
+      );
+
+    if (cachedCalendar == null) {
+      return this.refreshCalendar(calendarConfig);
+    } else if (cachedCalendar.standardTtlExpired) {
+      try {
+        return this.refreshCalendar(calendarConfig);
+      } catch (e) {
+        Log.error(`Error while refreshing calendar. Serving stale cache.`, e, {
+          calendarId: calendarId,
+        });
+        return cachedCalendar.calendar;
+      }
+    } else {
       return cachedCalendar.calendar;
     }
-  } else {
-    return cachedCalendar.calendar;
   }
 }
