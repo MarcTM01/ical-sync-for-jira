@@ -68,6 +68,7 @@
     "ical-generator": "^6.0.0",
     "jira.js": "^3.0.0",
     "morgan": "^1.10.0",
+    "redis": "^4.6.10",
     "validator": "^13.11.0",
     "winston": "^3.11.0"
   }

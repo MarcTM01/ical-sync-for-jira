@@ -5,11 +5,14 @@ import { createApp } from './api/express';
 import { createServer } from 'http';
 import { setupCalendarRoutes } from './api/calendarRoute';
 import { ApplicationConfig } from '@services/config';
+import { setupRedisClient } from '@services/jiraDeadlineCalendarCache';
 
 const Log = Logger.getLogger('index.ts');
 
-function launch() {
+async function launch() {
   Log.info(`Launching iCal sync for Jira v${packageJson.version}`);
+
+  await setupRedisClient();
 
   const app = createApp();
   setupCalendarRoutes(app);
@@ -22,9 +25,7 @@ function launch() {
   });
 }
 
-try {
-  launch();
-} catch (err) {
+launch().catch((err) => {
   Log.error('Critical error during application launch', err);
   exit(-1);
-}
+});

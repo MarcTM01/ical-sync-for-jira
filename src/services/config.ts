@@ -11,6 +11,8 @@ export interface SynchronizationConfiguration {
     jql?: string;
   };
   accessTokens: string[];
+  standardTtlInSeconds: number;
+  extendedTtlInSeconds: number;
 }
 
 interface ApplicationConfig {
@@ -19,6 +21,9 @@ interface ApplicationConfig {
     maxNumberOfApiRequestsPerSynchronization: number;
   };
   synchronizationConfig: SynchronizationConfiguration[];
+  redis: {
+    url: string;
+  };
 }
 
 function getConfigurationFromEnv(env: SystemEnvs): ApplicationConfig {
@@ -41,6 +46,12 @@ function getConfigurationFromEnv(env: SystemEnvs): ApplicationConfig {
           defaultValue: 50,
         },
       ),
+    },
+    redis: {
+      url: getConfigurationValueFromEnv(env, {
+        name: 'REDIS_URL',
+        isRequired: true,
+      }),
     },
     synchronizationConfig: getSynchronizationConfigsFromEnv(env),
   };
@@ -94,7 +105,7 @@ function getSynchronizationConfigFromEnv(
       jql: getConfigurationValueFromEnv<string | undefined>(env, {
         name: `${prefix}_JQL`,
         isRequired: false,
-        defaultValue: undefined,
+        defaultValue: 'due is not empty',
       }),
       authentication: {
         basic: {
@@ -109,6 +120,20 @@ function getSynchronizationConfigFromEnv(
         },
       },
     },
+    standardTtlInSeconds: getConfigurationValueFromEnv(env, {
+      name: `${prefix}_STANDARD_TTL_IN_SECONDS`,
+      stringValidator: validator.isInt,
+      converter: parseInt,
+      isRequired: false,
+      defaultValue: 300,
+    }),
+    extendedTtlInSeconds: getConfigurationValueFromEnv(env, {
+      name: `${prefix}_EXTENDED_TTL_IN_SECONDS`,
+      stringValidator: validator.isInt,
+      converter: parseInt,
+      isRequired: false,
+      defaultValue: 3600,
+    }),
   };
 }
 

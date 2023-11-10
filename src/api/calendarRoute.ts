@@ -1,6 +1,6 @@
 import express from 'express';
 import { ApiError } from '@utils/errors';
-import { getJiraDeadlineCalendar } from '../services/jiraDeadlineCalendar';
+import { getJiraDeadlineCalendar } from '@services/jiraDeadlineCalendar';
 import { asyncRequestHandler } from '@utils/api';
 
 export function setupCalendarRoutes(app: express.Application) {
