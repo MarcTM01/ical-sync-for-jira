@@ -11,6 +11,7 @@
     "format-fix": "prettier src/ tests/ --write",
     "clean": "rimraf build",
     "transpile": "tsc --build && tsc-alias",
+    "transpile-check": "tsc --noEmit",
     "start:dev": "ts-node -r tsconfig-paths/register -r dotenv/config ./src/index",
     "start:nodemon": "nodemon",
     "start:prod": "NODE_ENV=production node build/src",

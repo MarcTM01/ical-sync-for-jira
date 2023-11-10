@@ -4,8 +4,7 @@ import { generateCalendarForJiraIssues } from './jiraDeadlineCalendarIssueConver
 import { JiraDeadlineCalendarCacheService } from '@services/jiraDeadlineCalendarCache';
 import { Logger } from '@utils/logging';
 import { Config } from 'jira.js/src/config';
-
-const Log = Logger.getLogger('services/jiraDeadlineCalendar.ts');
+import { timingSafeEqual } from 'crypto';
 
 export class JiraDeadlineCalendar {
   readonly calendarId: string;
@@ -36,6 +35,7 @@ export class JiraDeadlineCalendarService {
   private readonly jiraService: JiraService;
   private readonly jiraDeadlineCalendarCacheService: JiraDeadlineCalendarCacheService;
   private readonly synchronizationConfigs: SynchronizationConfiguration[];
+  private readonly log = Logger.getLogger('services/jiraDeadlineCalendar.ts');
 
   constructor(
     jiraService: JiraService,
@@ -63,7 +63,16 @@ export class JiraDeadlineCalendarService {
       throw this.generateNotFoundError();
     }
 
-    const authorized = calendarConfig.accessTokens.includes(accessToken);
+    const authorized = calendarConfig.accessTokens.some(
+      // Use timingSafeEqual() to prevent leaking secrets in a timing side-channel attack
+      (validAccessToken) =>
+        validAccessToken.length == accessToken.length &&
+        timingSafeEqual(
+          Buffer.from(validAccessToken),
+          Buffer.from(accessToken),
+        ),
+    );
+
     if (!authorized) {
       // Throw identical 404 to not leak valid calendar ids to attackers.
       throw this.generateNotFoundError();
@@ -118,11 +127,15 @@ export class JiraDeadlineCalendarService {
       return this.refreshCalendar(calendarConfig);
     } else if (cachedCalendar.standardTtlExpired) {
       try {
-        return this.refreshCalendar(calendarConfig);
+        return await this.refreshCalendar(calendarConfig);
       } catch (e) {
-        Log.error(`Error while refreshing calendar. Serving stale cache.`, e, {
-          calendarId: calendarId,
-        });
+        this.log.error(
+          `Error while refreshing calendar. Serving stale cache.`,
+          e,
+          {
+            calendarId: calendarId,
+          },
+        );
         return cachedCalendar.calendar;
       }
     } else {
