@@ -4,7 +4,7 @@ import packageJson from 'package.json';
 import { createApp } from './api/express';
 import { createServer } from 'http';
 import { CalendarRouteController } from './api/calendarRoute';
-import { ApplicationConfig } from '@services/config';
+import { getConfigurationFromEnv } from '@services/config';
 import { JiraDeadlineCalendarCacheService } from '@services/jiraDeadlineCalendarCache';
 import { JiraService } from '@services/jira';
 import { JiraDeadlineCalendarService } from '@services/jiraDeadlineCalendar';
@@ -13,6 +13,7 @@ const Log = Logger.getLogger('index.ts');
 
 async function launch() {
   Log.info(`Launching iCal sync for Jira v${packageJson.version}`);
+  const ApplicationConfig = getConfigurationFromEnv(process.env);
 
   const jiraDeadlineCalendarCacheService = new JiraDeadlineCalendarCacheService(
     ApplicationConfig.redis,
@@ -23,6 +24,7 @@ async function launch() {
   const jiraDeadlineCalendarService = new JiraDeadlineCalendarService(
     jiraService,
     jiraDeadlineCalendarCacheService,
+    ApplicationConfig.synchronizationConfig,
   );
 
   const app = createApp();

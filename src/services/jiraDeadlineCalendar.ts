@@ -1,12 +1,9 @@
-import {
-  ApplicationConfig,
-  SynchronizationConfiguration,
-} from '@services/config';
 import { ApiError } from '@utils/errors';
 import { JiraService } from './jira';
 import { generateCalendarForJiraIssues } from './jiraDeadlineCalendarIssueConverter';
 import { JiraDeadlineCalendarCacheService } from '@services/jiraDeadlineCalendarCache';
 import { Logger } from '@utils/logging';
+import { Config } from 'jira.js/src/config';
 
 const Log = Logger.getLogger('services/jiraDeadlineCalendar.ts');
 
@@ -22,16 +19,32 @@ export class JiraDeadlineCalendar {
   }
 }
 
+export interface SynchronizationConfiguration {
+  id: string;
+  calendarName: string;
+  jiraConfiguration: {
+    host: string;
+    authentication: Config.Authentication;
+    jql?: string;
+  };
+  accessTokens: string[];
+  standardTtlInSeconds: number;
+  extendedTtlInSeconds: number;
+}
+
 export class JiraDeadlineCalendarService {
   private readonly jiraService: JiraService;
   private readonly jiraDeadlineCalendarCacheService: JiraDeadlineCalendarCacheService;
+  private readonly synchronizationConfigs: SynchronizationConfiguration[];
 
   constructor(
     jiraService: JiraService,
     jiraDeadlineCalendarCacheService: JiraDeadlineCalendarCacheService,
+    synchronizationConfigs: SynchronizationConfiguration[],
   ) {
     this.jiraService = jiraService;
     this.jiraDeadlineCalendarCacheService = jiraDeadlineCalendarCacheService;
+    this.synchronizationConfigs = synchronizationConfigs;
   }
 
   private generateNotFoundError(): ApiError {
@@ -42,7 +55,7 @@ export class JiraDeadlineCalendarService {
     calendarId: string,
     accessToken: string,
   ): SynchronizationConfiguration {
-    const calendarConfig = ApplicationConfig.synchronizationConfig.find(
+    const calendarConfig = this.synchronizationConfigs.find(
       (it) => it.id == calendarId,
     );
 

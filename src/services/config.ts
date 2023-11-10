@@ -1,32 +1,17 @@
-import { Config } from 'jira.js/src/config';
 import validator from 'validator';
 import { getConfigurationValueFromEnv, SystemEnvs } from '@utils/config';
-
-export interface SynchronizationConfiguration {
-  id: string;
-  calendarName: string;
-  jiraConfiguration: {
-    host: string;
-    authentication: Config.Authentication;
-    jql?: string;
-  };
-  accessTokens: string[];
-  standardTtlInSeconds: number;
-  extendedTtlInSeconds: number;
-}
+import { JiraServiceConfig } from '@services/jira';
+import { SynchronizationConfiguration } from '@services/jiraDeadlineCalendar';
+import { RedisConfiguration } from '@services/jiraDeadlineCalendarCache';
 
 interface ApplicationConfig {
   port: number;
-  jira: {
-    maxNumberOfApiRequestsPerSynchronization: number;
-  };
+  jira: JiraServiceConfig;
   synchronizationConfig: SynchronizationConfiguration[];
-  redis: {
-    url: string;
-  };
+  redis: RedisConfiguration;
 }
 
-function getConfigurationFromEnv(env: SystemEnvs): ApplicationConfig {
+export function getConfigurationFromEnv(env: SystemEnvs): ApplicationConfig {
   return {
     port: getConfigurationValueFromEnv(env, {
       name: 'PORT',
@@ -136,7 +121,3 @@ function getSynchronizationConfigFromEnv(
     }),
   };
 }
-
-export const ApplicationConfig: ApplicationConfig = getConfigurationFromEnv(
-  process.env,
-);

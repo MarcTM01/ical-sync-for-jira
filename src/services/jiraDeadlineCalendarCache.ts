@@ -1,5 +1,4 @@
 import { createClient } from 'redis';
-import { ApplicationConfig } from '@services/config';
 import { Logger } from '@utils/logging';
 import { JiraDeadlineCalendar } from '@services/jiraDeadlineCalendar';
 export interface CalendarCacheResponse {
@@ -38,7 +37,7 @@ export class JiraDeadlineCalendarCacheService {
   async connect() {
     this.log.info('Connecting to redis database');
     this.redisClient = await createClient({
-      url: ApplicationConfig.redis.url,
+      url: this.redisConfig.url,
     })
       .on('error', (err) => this.log.error('Redis client error', err))
       .connect();
