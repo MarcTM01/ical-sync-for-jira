@@ -79,7 +79,7 @@ export class ExpressApp {
 
     const httpServer = createServer(this.app);
     httpServer.listen(port, () => {
-      this.log.info(`HTTP-Server live at http://127.0.0.1:port`);
+      this.log.info(`HTTP-Server live at http://127.0.0.1:${port}`);
     });
   }
 }
