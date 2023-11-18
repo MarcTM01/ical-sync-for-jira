@@ -17,7 +17,7 @@ function wait_for_service_availability {
 
 function test_calendar_can_be_retrieved {
   curl --fail --silent http://127.0.0.1:8080/calendars/my-calendar/ical\?accessToken\=test-token \
-    | grep -q "SUMMARY:TP-1 Testing-Task 1 Deadlines"
+    | grep -q "SUMMARY:TP-1 Testing-Task 1 Deadline"
 }
 
 wait_for_service_availability
