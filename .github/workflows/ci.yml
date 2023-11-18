@@ -1,8 +1,23 @@
-name: Simple CI pipeline
+name: CI pipeline
 
 on: ['push']
 
 jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Launch docker-compose stack
+        run: docker compose -f compose.test.yml up -d --build
+        env:
+          JIRA_HOST: ${{ secrets.JIRA_HOST }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      - name: Run simple integration tests
+        run: /tests/integration/run-integration-tests.sh
+
   check-npm-tasks:
     runs-on: ubuntu-latest
 
