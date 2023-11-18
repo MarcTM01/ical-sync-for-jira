@@ -16,7 +16,7 @@ jobs:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
 
       - name: Run simple integration tests
-        run: /tests/integration/run-integration-tests.sh
+        run: ./tests/integration/run-integration-tests.sh
 
   check-npm-tasks:
     runs-on: ubuntu-latest
