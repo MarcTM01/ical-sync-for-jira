@@ -50,7 +50,7 @@ jobs:
         run: |
           VERSION=$(jq -r '.version' package.json)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "TAGS=ghcr.io/marctm01/ical-sync-for-jira:latest,ghcr.io/marctm01/ical-sync-for-jira:$VERSION" >> $GITHUB_OUTPUT
+          echo "TAGS=ghcr.io/marctm01/ical-sync-for-jira:latest, ghcr.io/marctm01/ical-sync-for-jira:$VERSION" >> $GITHUB_OUTPUT
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
