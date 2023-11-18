@@ -1,0 +1,34 @@
+name: Simple CI pipeline
+
+on: ['push']
+
+jobs:
+  check-npm-tasks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.9.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Check if ESLint passes
+        if: '!cancelled()'
+        run: npm run lint-check
+
+      - name: Check if Prettier passes
+        if: '!cancelled()'
+        run: npm run format-check
+
+      - name: Check if the code transpiles
+        if: '!cancelled()'
+        run: npm run transpile-check
+
+      - name: Check if the unit tests pass
+        if: '!cancelled()'
+        run: npm run test
