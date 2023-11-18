@@ -1,8 +1,7 @@
 import { Logger } from '@utils/logging';
 import { exit } from 'process';
 import packageJson from 'package.json';
-import { createApp } from './api/express';
-import { createServer } from 'http';
+import { ExpressApp } from './api/express';
 import { CalendarRouteController } from './api/calendarRoute';
 import { getConfigurationFromEnv } from '@services/config';
 import { JiraDeadlineCalendarCacheService } from '@services/jiraDeadlineCalendarCache';
@@ -27,19 +26,14 @@ async function launch() {
     ApplicationConfig.synchronizationConfig,
   );
 
-  const app = createApp();
+  const expressContainer = new ExpressApp();
 
   const calendarController = new CalendarRouteController(
     jiraDeadlineCalendarService,
   );
-  calendarController.setupCalendarRoutes(app);
+  calendarController.setupCalendarRoutes(expressContainer.app);
 
-  app.set('port', ApplicationConfig.port);
-
-  const httpServer = createServer(app);
-  httpServer.listen(ApplicationConfig.port, () => {
-    Log.info(`HTTP-Server live at http://127.0.0.1:${ApplicationConfig.port}`);
-  });
+  expressContainer.listen(ApplicationConfig.port);
 }
 
 launch().catch((err) => {
