@@ -3,5 +3,6 @@
   "extends": [
     "config:recommended"
   ],
-  "bumpVersion": "patch"
+  "bumpVersion": "patch",
+  "automerge": true
 }
