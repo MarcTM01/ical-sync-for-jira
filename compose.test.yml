@@ -1,0 +1,19 @@
+---
+version: '3.8'
+services:
+  ical-sync-for-jira:
+    build: ./
+    environment:
+      NUMBER_OF_SYNCHRONIZATION_CONFIGS: 1
+      REDIS_URL: "redis://redis"
+      CONFIG_0_ID: "my-calendar"
+      CONFIG_0_CALENDAR_NAME: "my-calendar"
+      CONFIG_0_ACCESS_TOKENS: "test-token"
+      CONFIG_0_JIRA_HOST: ${JIRA_HOST}
+      CONFIG_0_EMAIL: ${JIRA_EMAIL}
+      CONFIG_0_API_TOKEN: ${JIRA_API_TOKEN}
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  redis:
+    image: redis:7.2-alpine
