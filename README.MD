@@ -69,7 +69,7 @@ Example: `1`. How many different iCalendar files do you want to serve?
 
 #### - `CONFIG_X_ID`
 Example: `my-calendar`. A unique identifier for a calendar. 
-The calendar will be available at: http://127.0.0.1:8080/calendars/<ID>/ical?accessToken=<TOKEN>.
+The calendar will be available at: http://127.0.0.1:8080/calendars/{ID}/ical?accessToken={TOKEN}.
 
 #### - `CONFIG_X_CALENDAR_NAME`
 Example: `My Calendar`. A name for the iCal calendar.
