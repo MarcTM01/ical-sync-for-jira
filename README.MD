@@ -97,6 +97,6 @@ Example: `300`. The duration for which a retrieved calendar will be cached in se
 After the TTL of a cached entry expires, subsequent requests will trigger a refresh. Defaults to `300`.
 
 #### - `CONFIG_X_EXTENDED_TTL_IN_SECONDS`
-Example: `3600`. Sometimes, a calendar cannot be refreshed (e.g., Jira is not reachable).
+Example: `3600`. Sometimes, a calendar cannot be refreshed (as e.g., Jira is not reachable).
 In these cases, it may be desirable to serve a cached version of the calendar whose standard TTL has expired
 instead of throwing an error. The extended TTL controls for how long this is acceptable.
