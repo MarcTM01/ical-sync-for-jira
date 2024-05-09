@@ -12,7 +12,8 @@
         "node-version: '(?<currentValue>.+?)'"
       ],
       "datasourceTemplate":"node",
-      "versioningTemplate": "node"
+      "versioningTemplate": "node",
+      "depNameTemplate": "node"
     },
     {
       "fileMatch": ["^\\.github\\/workflows\\/.*\\.ya?ml$"],
