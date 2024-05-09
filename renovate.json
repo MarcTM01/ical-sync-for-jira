@@ -4,5 +4,23 @@
     "config:recommended"
   ],
   "bumpVersion": "patch",
-  "automerge": true
+  "automerge": true,
+  "customManagers": [
+    {
+      "fileMatch": ["^\\.github\\/workflows\\/.*\\.ya?ml$"],
+      "matchStrings": [
+        "node-version: '(?<currentValue>.+?)'"
+      ],
+      "datasourceTemplate":"node",
+      "versioningTemplate": "node"
+    },
+    {
+      "fileMatch": ["^\\.github\\/workflows\\/.*\\.ya?ml$"],
+      "matchStrings": [
+        "cosign-release: '(?<currentValue>.+?)'"
+      ],
+      "datasourceTemplate":"github-releases",
+      "packageNameTemplate": "sigstore/cosign"
+    }
+  ]
 }
