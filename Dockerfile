@@ -1,11 +1,11 @@
-FROM node:lts-alpine@sha256:a8bb2146311c2125bb98647b8980fa7a90fb2f2a76f749152c1830651401ed94 AS build
+FROM node:lts-alpine@sha256:6ce211be2226e86d61413dc19f11cab7ab96205837811c6356881a4157cea0c5 AS build
 USER node
 WORKDIR /usr/src/app
 
 COPY --chown=node:node . /usr/src/app
 RUN npm ci --ignore-scripts && npm run transpile && npm ci --omit=dev --ignore-scripts
 
-FROM node:lts-alpine@sha256:a8bb2146311c2125bb98647b8980fa7a90fb2f2a76f749152c1830651401ed94
+FROM node:lts-alpine@sha256:6ce211be2226e86d61413dc19f11cab7ab96205837811c6356881a4157cea0c5
 RUN apk add dumb-init
 
 ENV NODE_ENV production
