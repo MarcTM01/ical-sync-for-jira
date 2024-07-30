@@ -16,4 +16,4 @@ services:
       - "127.0.0.1:8080:8080"
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:7.4-alpine
